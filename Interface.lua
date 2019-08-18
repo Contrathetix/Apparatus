@@ -25,11 +25,11 @@ function GroupMenu.Interface.UpdateMenu()
 
     GroupMenu.Interface.UpdateHeaderLabels()
 
+    GROUP_LIST:UpdateHeaders(GROUP_LIST.groupSize > 0)
+
     for i=1, #GROUP_LIST_MANAGER.masterList do
         GroupMenu.Interface.UpdateRow(i)
     end
-
-    GROUP_LIST:UpdateHeaders(GROUP_LIST.groupSize > 0)
 
 end
 
@@ -102,10 +102,8 @@ function GroupMenu.Interface.UpdateColumnVisibility(rowItemList, isHeaderRow)
 
         if isHeaderRow then
             local isInHeadersTable = GroupMenu.Interface.DoesTableContainElement(GROUP_LIST.headers, currentItem)
-            if columnEnabled == true and isInHeadersTable == false then
+            if columnEnabled and isInHeadersTable == false then
                 table.insert(GROUP_LIST.headers, currentItem)
-            elseif columnEnabled == false and isInHeadersTable == true then
-                GroupMenu.Interface.RemoveTableElement(GROUP_LIST.headers, currentItem)
             end
         end
 
@@ -123,15 +121,6 @@ function GroupMenu.Interface.DoesTableContainElement(table, element)
         end
     end
     return false
-end
-
-function GroupMenu.Interface.RemoveTableElement(table, element)
-    for key, value in pairs(table) do
-        if value == element then
-            table[key] = nil
-            break
-        end
-    end
 end
 
 function GroupMenu.Interface.UpdateRow(index)
@@ -170,6 +159,7 @@ function GroupMenu.Interface.UpdateRow(index)
     local allianceIndicatorTexture = extraRowElements[GroupMenu.Constants.COLUMN_INDEX_ALLIANCE]:GetNamedChild('Texture')
     allianceIndicatorTexture:SetTexture(ZO_GuildBrowser_GuildList_Keyboard:GetAllianceIcon(allianceId))
     allianceIndicatorTexture.allianceName = GetAllianceName(allianceId)
+    extraRowElements[GroupMenu.Constants.COLUMN_INDEX_ALLIANCE]:SetHidden(unitData.online == false)
 
     -- update alliance rank indicator texture and tooltip
     local allianceRankIndicatorTexture = extraRowElements[GroupMenu.Constants.COLUMN_INDEX_ALLIANCE_RANK]:GetNamedChild('Texture')

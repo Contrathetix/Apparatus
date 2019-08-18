@@ -44,28 +44,6 @@ function GroupMenu.ConfigData.GetColumnWidth(column)
     return GroupMenu.ConfigData.GetColumnEnabled(column) and GroupMenu.ConfigData.ColumnWidth[column] or 1
 end
 
-function GroupMenu.ConfigData.GetEnabledColumnIndexes()
-
-    local enabledColumIndexes = {}
-    local potentialColumnIndexes = {
-        GroupMenu.Constants.COLUMN_INDEX_CP,
-        GroupMenu.Constants.COLUMN_INDEX_ALLIANCE,
-        GroupMenu.Constants.COLUMN_INDEX_ALLIANCE_RANK,
-        GroupMenu.Constants.COLUMN_INDEX_RACE,
-        GroupMenu.Constants.COLUMN_INDEX_GENDER,
-        GroupMenu.Constants.COLUMN_INDEX_SOCIAL
-    }
-
-    for i=1, #potentialColumnIndexes do
-        if GroupMenu.ConfigData.Saved.Columns[potentialColumnIndexes[i]] then
-            table.insert(enabledColumIndexes, potentialColumnIndexes[i])
-        end
-    end
-
-    return enabledColumIndexes
-
-end
-
 function GroupMenu.ConfigData.GetColumnWidthAll()
     return {
         [GroupMenu.Constants.COLUMN_INDEX_CP] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.COLUMN_INDEX_CP),
