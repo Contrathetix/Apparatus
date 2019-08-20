@@ -62,7 +62,7 @@ function GroupMenu.Events.OnAddOnLoaded(_, addonName)
 
     EVENT_MANAGER:UnregisterForEvent(GroupMenu.Info.AddOnName, EVENT_ADD_ON_LOADED)
 
-    GroupMenu.ConfigData.Saved = ZO_SavedVars:NewAccountWide('GroupMenuData', 1, nil, GroupMenu.ConfigData.SavedTemplate)
+    GroupMenu.ConfigData.Saved = ZO_SavedVars:NewAccountWide('GroupMenuData', GroupMenu.Info.SavedVariablesVersion, nil, GroupMenu.ConfigData.SavedTemplate)
     GroupMenu.ConfigMenu.SetupMenu()
 
     SCENE_MANAGER:GetScene(GroupMenu.Events.GroupSceneName):RegisterCallback('StateChange', GroupMenu.Events.OnSceneChange)

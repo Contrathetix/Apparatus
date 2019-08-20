@@ -10,39 +10,28 @@ GroupMenu.Interface.Elements.PotentialColumnChildrenToToggle = {
 }
 
 function GroupMenu.Interface.UpdateMenuData()
-
     GroupMenu.Interface.UpdateHeaderRow()
-
     for i=1, #GROUP_LIST_MANAGER.masterList do
         GroupMenu.Interface.UpdateRowData(i)
     end
-
 end
 
 function GroupMenu.Interface.GetHeaderRow()
-
     return ZO_GroupListHeaders, 'ZO_GroupListHeaders'
-
 end
 
 function GroupMenu.Interface.GetListRow(index)
-
     local name = 'ZO_GroupListList1Row'..index
-
     return _G[name], name
-
 end
 
 function GroupMenu.Interface.DoesTableContainElement(table, element)
-
     for _, value in pairs(table) do
         if value == element then
             return true
         end
     end
-
     return false
-
 end
 
 function GroupMenu.Interface.GetGenericRowElements(parent, namePrefix, templatePrefix, isHeaderRow)
@@ -151,7 +140,7 @@ function GroupMenu.Interface.UpdateRowData(index)
     local displayName = GetUnitDisplayName(unitData.unitTag)
     local characterName = GetUnitName(unitData.unitTag)
     local race = GetUnitRace(unitData.unitTag)
-    local socialStatus = 'Neutral'
+    local socialStatus = GroupMenu.Strings.SocialStatusNeutral
     local gender = unitData.gender == 1 and GroupMenu.Strings.GenderFemale or GroupMenu.Strings.GenderMale
     local trueChampionPoints = unitData.online and GetUnitChampionPoints(unitData.unitTag) or ''
     local allianceId = GetUnitAlliance(unitData.unitTag)
@@ -165,11 +154,11 @@ function GroupMenu.Interface.UpdateRowData(index)
     if unitData.online == false then
         socialStatus = ''
     elseif unitData.isPlayer then
-        socialStatus = 'Self'
+        socialStatus = GroupMenu.Strings.SocialStatusSelf
     elseif IsUnitFriend(unitData.unitTag) then
-        socialStatus = 'Friend'
+        socialStatus = GroupMenu.Strings.SocialStatusFriend
     elseif IsUnitIgnored(unitData.tag) then
-        socialStatus = 'Ignored'
+        socialStatus = GroupMenu.Strings.SocialStatusIgnored
     end
 
     -- update the new name label text and tooltip
@@ -251,12 +240,12 @@ function GroupMenu.Interface.UpdateRowElementWidth(rowElements, isHeaderRow)
             end
 
             element:SetWidth(elementWidth)
-            GroupMenu.Interface.SafeSetElementHiddenStatus(element, elementDisabled and true or nil)
+            GroupMenu.Interface.SafeSetElementHiddenStatus(element, elementDisabled)
 
             for _, elementName in pairs(GroupMenu.Interface.Elements.PotentialColumnChildrenToToggle) do
                 local childElement = element:GetNamedChild(elementName)
                 if childElement then
-                    GroupMenu.Interface.SafeSetElementHiddenStatus(childElement, elementDisabled and true or nil)
+                    GroupMenu.Interface.SafeSetElementHiddenStatus(childElement, elementDisabled)
                 end
             end
 
@@ -270,7 +259,7 @@ end
 
 function GroupMenu.Interface.SafeSetElementHiddenStatus(element, hidden)
 
-    if hidden then
+    if hidden == true then
         GroupMenu.Interface.SafeSetElementMouseEnabled(element, false)
         GroupMenu.Interface.SafeSetElementOffsetX(element, 0)
         GroupMenu.Interface.SafeSetElementHidden(element, true)

@@ -3,5 +3,6 @@ GroupMenu = {}
 GroupMenu.Info = {
     AddOnName = 'GroupMenu',
     Author = 'Contrathetix',
-    Version = '1'
+    Version = '2',
+    SavedVariablesVersion = 2
 }

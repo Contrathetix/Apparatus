@@ -3,7 +3,8 @@ GroupMenu.Strings.ConfigMenu = {
     Header = {
         Display = 'Display Options',
         ColumnToggle = 'Column Toggles',
-        ColumnWidth = 'Column Widths'
+        ColumnWidth = 'Column Widths',
+        Miscellaneous = 'Miscellaneous'
     },
 
     Option = {
@@ -23,7 +24,8 @@ GroupMenu.Strings.ConfigMenu = {
         AllianceRank = 'Display Alliance Rank',
         Race = 'Display Race',
         Gender = 'Display Gender',
-        Social = 'Display Social'
+        Social = 'Display Social',
+        Reset = 'Reset Configuration'
     },
 
     Slider = {
@@ -61,7 +63,8 @@ GroupMenu.Strings.ConfigMenu = {
         AllianceRank = 'Toggle the column to display the member AvA rank icon.',
         Race = 'Toggle the column to display member character race icon.',
         Gender = 'Toggle the column to display member character gender.',
-        Social = 'Toggle the column to display member social status.'
+        Social = 'Toggle the column to display member social status.',
+        Reset = 'Reset the add-on configuration options to their default values.'
     }
 
 }

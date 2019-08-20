@@ -7,7 +7,7 @@ function GroupMenu.ConfigMenu.SetupMenu()
     -- Skip the configuration if there is no LibAddonMenu
     if LAM2 == nil then return end
 
-	local panelData = {
+    local panelData = {
         type = 'panel',
         name = GroupMenu.Info.AddOnName,
         displayName = GroupMenu.Info.AddOnName,
@@ -19,10 +19,10 @@ function GroupMenu.ConfigMenu.SetupMenu()
     LAM2:RegisterAddonPanel('GroupMenuConfig', panelData)
 
     local optionsData = {
-		[1] = {
-			type = 'header',
-			name = GroupMenu.Strings.ConfigMenu.Header.Display
-		},
+        [1] = {
+            type = 'header',
+            name = GroupMenu.Strings.ConfigMenu.Header.Display
+        },
         [2] = GroupMenu.ConfigMenu.GetNameDisplayModeDropdownOption(),
         [3] = GroupMenu.ConfigMenu.GetChampionPointAboveCapToggleOption(),
         [4] = {
@@ -62,8 +62,21 @@ function GroupMenu.ConfigMenu.SetupMenu()
         [32] = GroupMenu.ConfigMenu.GetColumnWidthSliderOption('AllianceRank', GroupMenu.Constants.INDEX_ALLIANCERANK),
         [33] = GroupMenu.ConfigMenu.GetColumnWidthSliderOption('Race', GroupMenu.Constants.INDEX_RACE),
         [34] = GroupMenu.ConfigMenu.GetColumnWidthSliderOption('Gender', GroupMenu.Constants.INDEX_GENDER),
-        [35] = GroupMenu.ConfigMenu.GetColumnWidthSliderOption('Social', GroupMenu.Constants.INDEX_SOCIAL)
-	}
+        [35] = GroupMenu.ConfigMenu.GetColumnWidthSliderOption('Social', GroupMenu.Constants.INDEX_SOCIAL),
+        [36] = {
+            type = 'header',
+            name = GroupMenu.Strings.ConfigMenu.Header.Miscellaneous
+        },
+        [37] = {
+            type = 'button',
+            name = GroupMenu.Strings.ConfigMenu.Option.Reset,
+            tooltip = GroupMenu.Strings.ConfigMenu.Tooltip.Reset,
+            func = function()
+                GroupMenu.ConfigData.ResetSavedData()
+            end,
+            width = 'full'
+        }
+    }
 
     LAM2:RegisterOptionControls('GroupMenuConfig', optionsData)
 
