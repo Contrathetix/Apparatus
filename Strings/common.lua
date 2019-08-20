@@ -1,4 +1,6 @@
 GroupMenu.Strings = {
+    MemberIndex = '#',
+    Name = 'Name',
     CharacterName = EsoStrings[SI_GROUP_LIST_PANEL_NAME_HEADER],
     DisplayName = EsoStrings[SI_GAMEPAD_INTERFACE_OPTIONS_PRIMARY_PLAYER_NAME],
     ChampionPoints = EsoStrings[SI_TRADING_HOUSE_BROWSE_CHAMPION_POINTS_RANGE_LABEL],

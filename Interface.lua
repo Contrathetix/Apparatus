@@ -1,136 +1,152 @@
 GroupMenu.Interface = {}
 
+GroupMenu.Interface.ChampionPointLabelSecondUpdateDelayMilliseconds = 100
+
 GroupMenu.Interface.Elements = {}
+GroupMenu.Interface.Elements.RowElements = {}
 
-function GroupMenu.Interface.Init()
+GroupMenu.Interface.Elements.PotentialColumnChildrenToToggle = {
+    'Icon', 'Heal', 'Tank', 'DPS'
+}
 
-    GroupMenu.Interface.Elements.GroupListHeaderRow = ZO_GroupListHeaders
-    GroupMenu.Interface.Elements.CharacterNameHeaderLabel = ZO_GroupListHeadersCharacterName
-    GroupMenu.Interface.Elements.ExtraRowElements = {}
+function GroupMenu.Interface.UpdateMenuData()
 
-    local prefix = 'ZO_GroupListHeaders'
-
-    GroupMenu.Interface.Elements.ExtraHeaderLabels = {
-        [GroupMenu.Constants.COLUMN_INDEX_CP] = CreateControlFromVirtual(prefix..'ChampionPointsHeader', GroupMenu.Interface.Elements.GroupListHeaderRow, 'GroupMenu_Interface_Header_ChampionPoints'),
-        [GroupMenu.Constants.COLUMN_INDEX_ALLIANCE] = CreateControlFromVirtual(prefix..'Alliance', GroupMenu.Interface.Elements.GroupListHeaderRow, 'GroupMenu_Interface_Header_Alliance'),
-        [GroupMenu.Constants.COLUMN_INDEX_ALLIANCE_RANK] = CreateControlFromVirtual(prefix..'AllianceRank', GroupMenu.Interface.Elements.GroupListHeaderRow, 'GroupMenu_Interface_Header_AllianceRank'),
-        [GroupMenu.Constants.COLUMN_INDEX_RACE] = CreateControlFromVirtual(prefix..'Race', GroupMenu.Interface.Elements.GroupListHeaderRow, 'GroupMenu_Interface_Header_Race'),
-        [GroupMenu.Constants.COLUMN_INDEX_GENDER] = CreateControlFromVirtual(prefix..'Gender', GroupMenu.Interface.Elements.GroupListHeaderRow, 'GroupMenu_Interface_Header_Gender'),
-        [GroupMenu.Constants.COLUMN_INDEX_SOCIAL] = CreateControlFromVirtual(prefix..'Social', GroupMenu.Interface.Elements.GroupListHeaderRow, 'GroupMenu_Interface_Header_Social')
-    }
-
-end
-
-function GroupMenu.Interface.UpdateMenu()
-
-    GroupMenu.Interface.UpdateHeaderLabels()
-
-    GROUP_LIST:UpdateHeaders(GROUP_LIST.groupSize > 0)
+    GroupMenu.Interface.UpdateHeaderRow()
 
     for i=1, #GROUP_LIST_MANAGER.masterList do
-        GroupMenu.Interface.UpdateRow(i)
+        GroupMenu.Interface.UpdateRowData(i)
     end
 
 end
 
-function GroupMenu.Interface.UpdateGroupMenuSize(isMenuShown)
+function GroupMenu.Interface.GetHeaderRow()
 
-    local baseMenuWidth = 930
-    local baseMenuBackgroundWidth = 1024
-    local extraMenuWidth = 0
-
-    local menuWidthBase = 930
-    local menuWidthExtra = 0
-
-    local backgroundWidthBase = 1024
-    local backgroundWidthExtra = 0
-
-    if isMenuShown then
-        local configuredColumnWidths = GroupMenu.ConfigData.GetColumnWidthAll()
-        for i=1, #configuredColumnWidths do
-            menuWidthExtra = menuWidthExtra + configuredColumnWidths[i]
-        end
-        menuWidthExtra = menuWidthExtra + 40
-        backgroundWidthExtra = menuWidthExtra * 1.6
-    end
-
-    local backgroundWidth = backgroundWidthBase + backgroundWidthExtra
-
-    local backgroundAnchorOffsetX = -35 - menuWidthExtra
-    local backgroundAnchorOffsetY = -75
-
-    local titleAnchorOffsetX = 30 - menuWidthExtra
-    local titleAnchorOffsetY = -335
-
-    local displayNameAnchorOffsetX = 0 - menuWidthExtra
-    local displayNameAnchorOffsetY = 0
-
-    local difficultySettingAnchorOffsetX = 0 - menuWidthExtra * 0.6
-    local difficultySettingAnchorOffsetY = -10
-
-    ZO_SharedRightBackgroundLeft:SetAnchor(TOPLEFT, ZO_SharedRightBackground, TOPLEFT, backgroundAnchorOffsetX, backgroundAnchorOffsetY)
-    ZO_SharedRightBackgroundLeft:SetWidth(backgroundWidth)
-
-    ZO_GroupListVeteranDifficultySettings:SetAnchor(4, ZO_GroupList, 1, difficultySettingAnchorOffsetX, difficultySettingAnchorOffsetY)
-
-    ZO_SharedTitle:SetAnchor(8, GuiRoot, 8, titleAnchorOffsetX, titleAnchorOffsetY)
-    ZO_DisplayName:SetAnchor(3, ZO_KeyboardFriendsList, 3, displayNameAnchorOffsetX, displayNameAnchorOffsetY)
-
-    ZO_GroupMenu_Keyboard:SetWidth(menuWidthBase + menuWidthExtra)
+    return ZO_GroupListHeaders, 'ZO_GroupListHeaders'
 
 end
 
-function GroupMenu.Interface.UpdateHeaderLabels()
+function GroupMenu.Interface.GetListRow(index)
 
-    GroupMenu.Interface.UpdateColumnVisibility(GroupMenu.Interface.Elements.ExtraHeaderLabels, true)
+    local name = 'ZO_GroupListList1Row'..index
 
-    if GroupMenu.ConfigData.GetNameDisplayMode() == GroupMenu.Constants.MENU_NAME_DISPLAY_OPTION_ACCOUNT then
-        GroupMenu.Interface.Elements.CharacterNameHeaderLabel:SetText(GroupMenu.Strings.DisplayName)
-    else
-        GroupMenu.Interface.Elements.CharacterNameHeaderLabel:SetText(GroupMenu.Strings.CharacterName)
-    end
-
-end
-
-function GroupMenu.Interface.UpdateColumnVisibility(rowItemList, isHeaderRow)
-
-    for i=1, #rowItemList do
-
-        local currentItem = rowItemList[i]
-        local columnEnabled = GroupMenu.ConfigData.GetColumnEnabled(i)
-        local columnWidth = GroupMenu.ConfigData.GetColumnWidth(i)
-
-        if isHeaderRow then
-            local isInHeadersTable = GroupMenu.Interface.DoesTableContainElement(GROUP_LIST.headers, currentItem)
-            if columnEnabled and isInHeadersTable == false then
-                table.insert(GROUP_LIST.headers, currentItem)
-            end
-        end
-
-        currentItem:SetWidth(columnWidth)
-        currentItem:SetHidden(columnEnabled == false)
-
-    end
+    return _G[name], name
 
 end
 
 function GroupMenu.Interface.DoesTableContainElement(table, element)
+
     for _, value in pairs(table) do
         if value == element then
             return true
         end
     end
+
     return false
+
 end
 
-function GroupMenu.Interface.UpdateRow(index)
+function GroupMenu.Interface.GetGenericRowElements(parent, namePrefix, templatePrefix, isHeaderRow)
 
-    local row = GroupMenu.Interface.GetGroupListRow(index)
+    return {
+        [GroupMenu.Constants.INDEX_CROWN] = isHeaderRow and CreateControlFromVirtual(namePrefix..'Leader', parent, templatePrefix..'Leader') or parent:GetNamedChild('Leader'),
+        [GroupMenu.Constants.INDEX_NAME_ORIGINAL] = parent:GetNamedChild('CharacterName'),
+        [GroupMenu.Constants.INDEX_INDEX] = CreateControlFromVirtual(namePrefix..'MemberIndex', parent, templatePrefix..'MemberIndex'),
+        [GroupMenu.Constants.INDEX_NAME] = CreateControlFromVirtual(namePrefix..'Name', parent, templatePrefix..'Name'),
+        [GroupMenu.Constants.INDEX_ZONE] = parent:GetNamedChild('Zone'),
+        [GroupMenu.Constants.INDEX_CLASS] = parent:GetNamedChild('Class'),
+        [GroupMenu.Constants.INDEX_LEVEL] = parent:GetNamedChild('Level'),
+        [GroupMenu.Constants.INDEX_CHAMPIONICON] = parent:GetNamedChild('Champion'),
+        [GroupMenu.Constants.INDEX_ROLE] = parent:GetNamedChild('Role'),
+        [GroupMenu.Constants.INDEX_CP] = CreateControlFromVirtual(namePrefix..'ChampionPoints', parent, templatePrefix..'ChampionPoints'),
+        [GroupMenu.Constants.INDEX_ALLIANCE] = CreateControlFromVirtual(namePrefix..'Alliance', parent, templatePrefix..'Alliance'),
+        [GroupMenu.Constants.INDEX_ALLIANCERANK] = CreateControlFromVirtual(namePrefix..'AllianceRank', parent, templatePrefix..'AllianceRank'),
+        [GroupMenu.Constants.INDEX_RACE] = CreateControlFromVirtual(namePrefix..'Race', parent, templatePrefix..'Race'),
+        [GroupMenu.Constants.INDEX_GENDER] = CreateControlFromVirtual(namePrefix..'Gender', parent, templatePrefix..'Gender'),
+        [GroupMenu.Constants.INDEX_SOCIAL] = CreateControlFromVirtual(namePrefix..'Social', parent, templatePrefix..'Social')
+    }
 
-    if row == nil then return end
+end
+
+function GroupMenu.Interface.GetHeaderRowElements()
+
+    if GroupMenu.Interface.Elements.HeaderElements == nil then
+
+        local headerRow, namePrefix = GroupMenu.Interface.GetHeaderRow()
+        local templatePrefix = 'GroupMenu_GroupListHeaders'
+        local headerElements = GroupMenu.Interface.GetGenericRowElements(headerRow, namePrefix, templatePrefix, true)
+
+        -- update the zone label anchor to make room for the new name column
+        headerElements[GroupMenu.Constants.INDEX_ZONE]:SetAnchor(
+            LEFT,
+            headerElements[GroupMenu.Constants.INDEX_NAME],
+            RIGHT,
+            ZO_KEYBOARD_GROUP_LIST_PADDING_X
+        )
+
+        -- insert the new leader header label
+        headerElements[GroupMenu.Constants.INDEX_NAME_ORIGINAL]:SetAnchor(
+            LEFT,
+            headerElements[GroupMenu.Constants.INDEX_CROWN],
+            RIGHT,
+            0
+        )
+
+        -- update the offset between the index and new name label, so it looks better
+        headerElements[GroupMenu.Constants.INDEX_NAME]:SetAnchor(
+            LEFT,
+            headerElements[GroupMenu.Constants.INDEX_INDEX],
+            RIGHT,
+            ZO_KEYBOARD_GROUP_LIST_PADDING_X * 3
+        )
+
+        GroupMenu.Interface.Elements.HeaderElements = headerElements
+
+    end
+
+    return GroupMenu.Interface.Elements.HeaderElements
+
+end
+
+function GroupMenu.Interface.GetListRowElements(index)
+
+    if GroupMenu.Interface.Elements.RowElements[index] == nil then
+
+        local listRow, namePrefix = GroupMenu.Interface.GetListRow(index)
+        local templatePrefix = 'GroupMenu_GroupListRow'
+        local rowElements = GroupMenu.Interface.GetGenericRowElements(listRow, namePrefix, templatePrefix, false)
+
+        -- update the zone anchor to account for the new name column
+        rowElements[GroupMenu.Constants.INDEX_ZONE]:SetAnchor(
+            LEFT,
+            rowElements[GroupMenu.Constants.INDEX_NAME],
+            RIGHT,
+            ZO_KEYBOARD_GROUP_LIST_PADDING_X
+        )
+
+        -- update the offset between the index and new name label, so it looks better
+        rowElements[GroupMenu.Constants.INDEX_NAME]:SetAnchor(
+            LEFT,
+            rowElements[GroupMenu.Constants.INDEX_INDEX],
+            RIGHT,
+            ZO_KEYBOARD_GROUP_LIST_PADDING_X * 3
+        )
+
+        -- set the index column number
+        rowElements[GroupMenu.Constants.INDEX_INDEX]:SetText(index..'.')
+
+        GroupMenu.Interface.Elements.RowElements[index] = rowElements
+
+    end
+
+    return GroupMenu.Interface.Elements.RowElements[index]
+
+end
+
+function GroupMenu.Interface.UpdateRowData(index)
+
+    local rowElements = GroupMenu.Interface.GetListRowElements(index)
 
     local unitData = GROUP_LIST_MANAGER.masterList[index]
-    local extraRowElements = GroupMenu.Interface.GetRow(index)
 
     local displayName = GetUnitDisplayName(unitData.unitTag)
     local characterName = GetUnitName(unitData.unitTag)
@@ -142,6 +158,10 @@ function GroupMenu.Interface.UpdateRow(index)
     local allianceRank = GetUnitAvARank(unitData.unitTag)
     local allianceRankName = GetAvARankName(unitData.gender, allianceRank)
 
+    local updateChampionPointLabel = function()
+        rowElements[GroupMenu.Constants.INDEX_LEVEL]:SetText(trueChampionPoints)
+    end
+
     if unitData.online == false then
         socialStatus = ''
     elseif unitData.isPlayer then
@@ -152,92 +172,207 @@ function GroupMenu.Interface.UpdateRow(index)
         socialStatus = 'Ignored'
     end
 
+    -- update the new name label text and tooltip
+    if GroupMenu.ConfigData.GetNameDisplayMode() == GroupMenu.Constants.MENU_NAME_DISPLAY_OPTION_ACCOUNT then
+        rowElements[GroupMenu.Constants.INDEX_NAME]:SetText(displayName)
+        rowElements[GroupMenu.Constants.INDEX_NAME].tooltip = characterName
+    else
+        rowElements[GroupMenu.Constants.INDEX_NAME]:SetText(characterName)
+        rowElements[GroupMenu.Constants.INDEX_NAME].tooltip = displayName
+    end
+
     -- update the champion point label text
-    extraRowElements[GroupMenu.Constants.COLUMN_INDEX_CP]:SetText(trueChampionPoints)
+    rowElements[GroupMenu.Constants.INDEX_CP]:SetText(trueChampionPoints)
+
+    -- if chosen by the user, also replace the level label cp with actual cp count
+    -- but it needs to be done a second time with a delay, because something overwrites it somewhere
+    if GroupMenu.ConfigData.GetDisplayChampionPointsOverCap() and unitData.online then
+        updateChampionPointLabel()
+        zo_callLater(updateChampionPointLabel, GroupMenu.Interface.ChampionPointLabelSecondUpdateDelayMilliseconds)
+    end
 
     -- update the alliance indicator texture path and tooltip
-    local allianceIndicatorTexture = extraRowElements[GroupMenu.Constants.COLUMN_INDEX_ALLIANCE]:GetNamedChild('Texture')
+    local allianceIndicatorTexture = rowElements[GroupMenu.Constants.INDEX_ALLIANCE]:GetNamedChild('Texture')
     allianceIndicatorTexture:SetTexture(ZO_GuildBrowser_GuildList_Keyboard:GetAllianceIcon(allianceId))
-    allianceIndicatorTexture.allianceName = GetAllianceName(allianceId)
-    extraRowElements[GroupMenu.Constants.COLUMN_INDEX_ALLIANCE]:SetHidden(unitData.online == false)
+    allianceIndicatorTexture.tooltip = GetAllianceName(allianceId)
 
     -- update alliance rank indicator texture and tooltip
-    local allianceRankIndicatorTexture = extraRowElements[GroupMenu.Constants.COLUMN_INDEX_ALLIANCE_RANK]:GetNamedChild('Texture')
+    local allianceRankIndicatorTexture = rowElements[GroupMenu.Constants.INDEX_ALLIANCERANK]:GetNamedChild('Texture')
     allianceRankIndicatorTexture:SetTexture(GetAvARankIcon(allianceRank))
-    allianceRankIndicatorTexture.rankName = allianceRankName
+    allianceRankIndicatorTexture.tooltip = allianceRankName
 
     -- update race, gender and social status text
-    extraRowElements[GroupMenu.Constants.COLUMN_INDEX_RACE]:SetText(race)
-    extraRowElements[GroupMenu.Constants.COLUMN_INDEX_GENDER]:SetText(gender)
-    extraRowElements[GroupMenu.Constants.COLUMN_INDEX_SOCIAL]:SetText(socialStatus)
+    rowElements[GroupMenu.Constants.INDEX_RACE]:SetText(race)
+    rowElements[GroupMenu.Constants.INDEX_GENDER]:SetText(gender)
+    rowElements[GroupMenu.Constants.INDEX_SOCIAL]:SetText(socialStatus)
+
+    -- update the visibility (width) of the columns
+    GroupMenu.Interface.UpdateRowElementWidth(rowElements, false)
+
+    -- reset the colours and stuff
+    local row = GroupMenu.Interface.GetListRow(index)
+    if row then ZO_GroupListRow_OnMouseExit(row) end
+
+end
+
+function GroupMenu.Interface.UpdateHeaderRow()
+
+    local headerElements = GroupMenu.Interface.GetHeaderRowElements()
 
     if GroupMenu.ConfigData.GetNameDisplayMode() == GroupMenu.Constants.MENU_NAME_DISPLAY_OPTION_ACCOUNT then
-        row:GetNamedChild('CharacterName'):SetText(displayName)
-        GROUP_LIST_MANAGER.masterList[index].displayName = characterName
-        GROUP_LIST_MANAGER.masterList[index].characterName = displayName
+        headerElements[GroupMenu.Constants.INDEX_NAME]:SetText(GroupMenu.Strings.DisplayName)
     else
-        row:GetNamedChild('CharacterName'):SetText(characterName)
-        GROUP_LIST_MANAGER.masterList[index].displayName = displayName
-        GROUP_LIST_MANAGER.masterList[index].characterName = characterName
+        headerElements[GroupMenu.Constants.INDEX_NAME]:SetText(GroupMenu.Strings.CharacterName)
     end
 
-    GroupMenu.Interface.UpdateColumnVisibility(extraRowElements, false)
+    GroupMenu.Interface.UpdateRowElementWidth(headerElements, true)
 
-    ZO_GroupListRow_OnMouseExit(row)
+    GROUP_LIST:UpdateHeaders(GROUP_LIST.groupSize > 0)
 
 end
 
-function GroupMenu.Interface.GetRow(index)
+function GroupMenu.Interface.UpdateRowElementWidth(rowElements, isHeaderRow)
 
-    if GroupMenu.Interface.Elements.ExtraRowElements[index] == nil then
+    local previousElementDisabled = false
 
-        local row = GroupMenu.Interface.GetGroupListRow(index)
-        local prefix = 'ZO_GroupListList1Row'..index
+    for key, element in pairs(rowElements) do
 
-        GroupMenu.Interface.Elements.ExtraRowElements[index] = {
-            [GroupMenu.Constants.COLUMN_INDEX_CP] = CreateControlFromVirtual(prefix..'ChampionPointsLabel', row, 'GroupMenu_Interface_Row_ChampionPoints'),
-            [GroupMenu.Constants.COLUMN_INDEX_ALLIANCE] = CreateControlFromVirtual(prefix..'Alliance', row, 'GroupMenu_Interface_Row_Alliance'),
-            [GroupMenu.Constants.COLUMN_INDEX_ALLIANCE_RANK] = CreateControlFromVirtual(prefix..'AllianceRank', row, 'GroupMenu_Interface_Row_AllianceRank'),
-            [GroupMenu.Constants.COLUMN_INDEX_RACE] = CreateControlFromVirtual(prefix..'Race', row, 'GroupMenu_Interface_Row_Race'),
-            [GroupMenu.Constants.COLUMN_INDEX_GENDER] = CreateControlFromVirtual(prefix..'Gender', row, 'GroupMenu_Interface_Row_Gender'),
-            [GroupMenu.Constants.COLUMN_INDEX_SOCIAL] = CreateControlFromVirtual(prefix..'Social', row, 'GroupMenu_Interface_Row_Social')
-        }
+        if element ~= nil then
+
+            if isHeaderRow and GroupMenu.Interface.DoesTableContainElement(GROUP_LIST.headers, element) == false then
+                table.insert(GROUP_LIST.headers, element)
+            end
+
+            local elementWidth = GroupMenu.ConfigData.GetColumnWidth(key)
+            local elementDisabled = elementWidth < 2
+
+            local setElementHidden = function(elementToToggle, hidden)
+
+            end
+
+            element:SetWidth(elementWidth)
+            GroupMenu.Interface.SafeSetElementHiddenStatus(element, elementDisabled and true or nil)
+
+            for _, elementName in pairs(GroupMenu.Interface.Elements.PotentialColumnChildrenToToggle) do
+                local childElement = element:GetNamedChild(elementName)
+                if childElement then
+                    GroupMenu.Interface.SafeSetElementHiddenStatus(childElement, elementDisabled and true or nil)
+                end
+            end
+
+            previousElementDisabled = elementDisabled
+
+        end
 
     end
 
-    return GroupMenu.Interface.Elements.ExtraRowElements[index]
-
 end
 
-function GroupMenu.Interface.GetGroupListRow(index)
+function GroupMenu.Interface.SafeSetElementHiddenStatus(element, hidden)
 
-    return _G['ZO_GroupListList1Row'..index]
-
-end
-
-function GroupMenu.Interface.AllianceIndicator_OnMouseEnter(control)
-
-    if control.allianceName then
-        InitializeTooltip(InformationTooltip, control, BOTTOM)
-        SetTooltipText(InformationTooltip, control.allianceName)
+    if hidden then
+        GroupMenu.Interface.SafeSetElementMouseEnabled(element, false)
+        GroupMenu.Interface.SafeSetElementOffsetX(element, 0)
+        GroupMenu.Interface.SafeSetElementHidden(element, true)
+    else
+        GroupMenu.Interface.SafeSetElementMouseEnabled(element, nil)
+        GroupMenu.Interface.SafeSetElementOffsetX(element, nil)
+        GroupMenu.Interface.SafeSetElementHidden(element, nil)
     end
 
-    GroupMenu.Interface.Generic_OnMouseEnter(control)
-
 end
 
-function GroupMenu.Interface.AllianceRankIndicator_OnMouseEnter(control)
+function GroupMenu.Interface.SafeSetElementMouseEnabled(element, state)
 
-    if control.rankName then
-        InitializeTooltip(InformationTooltip, control, BOTTOM)
-        SetTooltipText(InformationTooltip, control.rankName)
+    if element.originalMouseEnabled == nil then
+        element.originalMouseEnabled = element:IsMouseEnabled()
     end
 
-    GroupMenu.Interface.Generic_OnMouseEnter(control)
+    element:SetMouseEnabled(state == nil and element.originalMouseEnabled or state)
 
 end
 
-function GroupMenu.Interface.Generic_OnMouseEnter(control)
+function GroupMenu.Interface.SafeSetElementOffsetX(element, newOffsetX)
+
+    local _, point, relTo, relPoint, offsetX, offsetY = element:GetAnchor(0)
+
+    if element.originalOffsetX == nil then
+        element.originalOffsetX = offsetX
+    end
+
+    if newOffsetX == nil then
+        newOffsetX = element.originalOffsetX
+    end
+
+    element:SetAnchor(point, relTo, relPoint, newOffsetX, offsetY)
+
+end
+
+function GroupMenu.Interface.SafeSetElementHidden(element, state)
+
+    if element.originalHiddenStatus == nil then
+        element.originalHiddenStatus = element:IsHidden()
+    end
+
+    element:SetHidden(state == nil and element.originalHiddenStatus or state)
+
+end
+
+function GroupMenu.Interface.UpdateGroupMenuSize(isMenuShown)
+
+    -- default widths
+    local menuWidthDefault = 930
+    local backgroundWidthDefault = 1024
+
+    -- the width of the left side of the menu, with the role selection, etc.
+    local menuWidth = menuWidthDefault
+    local backgroundWidth = backgroundWidthDefault
+
+    if isMenuShown then
+
+        local totalColumnWidth = GroupMenu.ConfigData.GetTotalColumnWidth()
+
+        menuWidth = ZO_GroupMenu_KeyboardPreferredRoles:GetWidth() + totalColumnWidth + 40
+        backgroundWidth = menuWidth + 200
+
+    end
+
+    local backgroundAnchorOffsetX = -35 - (menuWidth - menuWidthDefault)
+    local backgroundAnchorOffsetY = -75
+
+    local titleAnchorOffsetX = 30 - (menuWidth - menuWidthDefault)
+    local titleAnchorOffsetY = -335
+
+    local displayNameAnchorOffsetX = 0 - (menuWidth - menuWidthDefault)
+    local displayNameAnchorOffsetY = 0
+
+    local difficultySettingAnchorOffsetX = 0 - (menuWidth - menuWidthDefault) * 0.6
+    local difficultySettingAnchorOffsetY = -10
+
+    ZO_SharedRightBackgroundLeft:SetAnchor(TOPLEFT, ZO_SharedRightBackground, TOPLEFT, backgroundAnchorOffsetX, backgroundAnchorOffsetY)
+    ZO_SharedRightBackgroundLeft:SetWidth(backgroundWidth)
+
+    ZO_GroupListVeteranDifficultySettings:SetAnchor(BOTTOM, ZO_GroupList, TOP, difficultySettingAnchorOffsetX, difficultySettingAnchorOffsetY)
+
+    ZO_SharedTitle:SetAnchor(RIGHT, GuiRoot, RIGHT, titleAnchorOffsetX, titleAnchorOffsetY)
+    ZO_DisplayName:SetAnchor(TOPLEFT, ZO_KeyboardFriendsList, TOPLEFT, displayNameAnchorOffsetX, displayNameAnchorOffsetY)
+
+    ZO_GroupMenu_Keyboard:SetWidth(menuWidth)
+
+end
+
+function GroupMenu.Interface.GroupListRowTooltipControl_OnMouseEnter(control)
+
+    if control.tooltip then
+        InitializeTooltip(InformationTooltip, control, BOTTOMLEFT, 0, 0, TOPLEFT)
+        SetTooltipText(InformationTooltip, control.tooltip)
+    end
+
+    GroupMenu.Interface.GroupListRowLabel_OnMouseEnter(control)
+
+end
+
+function GroupMenu.Interface.GroupListRowLabel_OnMouseEnter(control)
 
     GROUP_LIST:EnterRow(control.row)
 
