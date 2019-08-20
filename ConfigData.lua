@@ -109,7 +109,21 @@ function GroupMenu.ConfigData.GetDefaultColumnWidth(column)
 end
 
 function GroupMenu.ConfigData.ResetSavedData()
-    GroupMenu.ConfigData.Saved = GroupMenu.ConfigData.SavedTemplate
+    GroupMenu.ConfigData.Saved = GroupMenu.ConfigData.RecursiveTableCopy(GroupMenu.ConfigData.SavedTemplate)
+end
+
+function GroupMenu.ConfigData.RecursiveTableCopy(source)
+    if source == nil then return nil end
+    local target = {}
+    for key, value in pairs(source) do
+        if type(value) == 'table' then
+            target[key] = GroupMenu.ConfigData.RecursiveTableCopy(value)
+        else
+            target[key] = value
+        end
+    end
+    setmetatable(target, GroupMenu.ConfigData.RecursiveTableCopy(getmetatable(source)))
+    return target
 end
 
 function GroupMenu.ConfigData.GetTotalColumnWidth()
