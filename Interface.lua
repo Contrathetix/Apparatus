@@ -1,6 +1,6 @@
 GroupMenu.Interface = {}
 
-GroupMenu.Interface.ChampionPointLabelSecondUpdateDelayMilliseconds = 100
+GroupMenu.Interface.LevelToChampionPointThreshold = 50
 
 GroupMenu.Interface.Elements = {}
 GroupMenu.Interface.Elements.RowElements = {}
@@ -43,7 +43,7 @@ function GroupMenu.Interface.GetGenericRowElements(parent, namePrefix, templateP
         [GroupMenu.Constants.INDEX_NAME] = CreateControlFromVirtual(namePrefix..'Name', parent, templatePrefix..'Name'),
         [GroupMenu.Constants.INDEX_ZONE] = parent:GetNamedChild('Zone'),
         [GroupMenu.Constants.INDEX_CLASS] = parent:GetNamedChild('Class'),
-        [GroupMenu.Constants.INDEX_LEVEL] = parent:GetNamedChild('Level'),
+        [GroupMenu.Constants.INDEX_LEVEL] = isHeaderRow and parent:GetNamedChild('Level') or CreateControlFromVirtual(namePrefix..'CustomLevel', parent, templatePrefix..'CustomLevel'),
         [GroupMenu.Constants.INDEX_CHAMPIONICON] = parent:GetNamedChild('Champion'),
         [GroupMenu.Constants.INDEX_ROLE] = parent:GetNamedChild('Role'),
         [GroupMenu.Constants.INDEX_CP] = CreateControlFromVirtual(namePrefix..'ChampionPoints', parent, templatePrefix..'ChampionPoints'),
@@ -104,10 +104,23 @@ function GroupMenu.Interface.GetListRowElements(index)
         local templatePrefix = 'GroupMenu_GroupListRow'
         local rowElements = GroupMenu.Interface.GetGenericRowElements(listRow, namePrefix, templatePrefix, false)
 
+        -- hide the existing level label
+        local originalLevelLabel = GroupMenu.Interface.GetListRow(index):GetNamedChild('Level')
+        originalLevelLabel:SetWidth(1)
+        GroupMenu.Interface.UpdateControlHiddenStatus(originalLevelLabel, true)
+
         -- update the zone anchor to account for the new name column
         rowElements[GroupMenu.Constants.INDEX_ZONE]:SetAnchor(
             LEFT,
             rowElements[GroupMenu.Constants.INDEX_NAME],
+            RIGHT,
+            ZO_KEYBOARD_GROUP_LIST_PADDING_X
+        )
+
+        -- anchor the role container to the new level container
+        rowElements[GroupMenu.Constants.INDEX_ROLE]:SetAnchor(
+            LEFT,
+            rowElements[GroupMenu.Constants.INDEX_LEVEL],
             RIGHT,
             ZO_KEYBOARD_GROUP_LIST_PADDING_X
         )
@@ -147,10 +160,6 @@ function GroupMenu.Interface.UpdateRowData(index)
     local allianceRank = GetUnitAvARank(unitData.unitTag)
     local allianceRankName = GetAvARankName(unitData.gender, allianceRank)
 
-    local updateChampionPointLabel = function()
-        rowElements[GroupMenu.Constants.INDEX_LEVEL]:SetText(trueChampionPoints)
-    end
-
     if unitData.online == false then
         socialStatus = ''
     elseif unitData.isPlayer then
@@ -173,11 +182,11 @@ function GroupMenu.Interface.UpdateRowData(index)
     -- update the champion point label text
     rowElements[GroupMenu.Constants.INDEX_CP]:SetText(trueChampionPoints)
 
-    -- if chosen by the user, also replace the level label cp with actual cp count
-    -- but it needs to be done a second time with a delay, because something overwrites it somewhere
-    if GroupMenu.ConfigData.GetDisplayChampionPointsOverCap() and unitData.online then
-        updateChampionPointLabel()
-        zo_callLater(updateChampionPointLabel, GroupMenu.Interface.ChampionPointLabelSecondUpdateDelayMilliseconds)
+    -- display champion points only up to cap or above the cap, depending on user choice
+    if unitData.level >= GroupMenu.Interface.LevelToChampionPointThreshold then
+        rowElements[GroupMenu.Constants.INDEX_LEVEL]:SetText(GroupMenu.ConfigData.GetDisplayChampionPointsOverCap() and trueChampionPoints or unitData.championPoints)
+    else
+        rowElements[GroupMenu.Constants.INDEX_LEVEL]:SetText(unitData.level)
     end
 
     -- update the alliance indicator texture path and tooltip
@@ -197,6 +206,11 @@ function GroupMenu.Interface.UpdateRowData(index)
 
     -- update the visibility (width) of the columns
     GroupMenu.Interface.UpdateRowElementWidth(rowElements, false)
+
+    -- update the crown column visibility
+    if GroupMenu.ConfigData.GetColumnEnabled(GroupMenu.Constants.INDEX_CROWN) and unitData.leader then
+        GroupMenu.Interface.UpdateControlHiddenStatus(rowElements[GroupMenu.Constants.INDEX_CROWN], false, true)
+    end
 
     -- reset the colours and stuff
     local row = GroupMenu.Interface.GetListRow(index)
@@ -222,88 +236,59 @@ end
 
 function GroupMenu.Interface.UpdateRowElementWidth(rowElements, isHeaderRow)
 
-    local previousElementDisabled = false
-
-    for key, element in pairs(rowElements) do
-
-        if element ~= nil then
-
-            if isHeaderRow and GroupMenu.Interface.DoesTableContainElement(GROUP_LIST.headers, element) == false then
-                table.insert(GROUP_LIST.headers, element)
+    for key, control in pairs(rowElements) do
+        if control ~= nil then
+            if isHeaderRow and GroupMenu.Interface.DoesTableContainElement(GROUP_LIST.headers, control) == false then
+                table.insert(GROUP_LIST.headers, control)
             end
+            local controlWidth = GroupMenu.ConfigData.GetColumnWidth(key)
+            control:SetWidth(controlWidth)
+            GroupMenu.Interface.UpdateControlHiddenStatus(control, controlWidth < 2)
+        end
+    end
 
-            local elementWidth = GroupMenu.ConfigData.GetColumnWidth(key)
-            local elementDisabled = elementWidth < 2
+end
 
-            local setElementHidden = function(elementToToggle, hidden)
+function GroupMenu.Interface.UpdateControlHiddenStatus(control, hidden, forceHiddenStatus)
 
+    local setHidden = function(control, hidden, forceHiddenStatus)
+
+        local _, point, relTo, relPoint, offsetX, offsetY = control:GetAnchor(0)
+        local mouseEnabled = control:IsMouseEnabled()
+        local hiddenStatus = control:IsHidden()
+
+        control.originalMouseEnabled = control.originalMouseEnabled ~= nil and control.originalMouseEnabled or mouseEnabled
+        control.originalOffsetX = control.originalOffsetX ~= nil and control.originalOffsetX or offsetX
+        control.originalHiddenStatus = control.originalHiddenStatus ~= nil and control.originalHiddenStatus or hiddenStatus
+
+        if hidden == true then
+            control:SetAnchor(point, relTo, relPoint, 0)
+            control:SetMouseEnabled(false)
+            control:SetHidden(true)
+        else
+            if offsetX ~= control.originalOffsetX then
+                control:SetAnchor(point, relTo, relPoint, control.originalOffsetX)
             end
-
-            element:SetWidth(elementWidth)
-            GroupMenu.Interface.SafeSetElementHiddenStatus(element, elementDisabled)
-
-            for _, elementName in pairs(GroupMenu.Interface.Elements.PotentialColumnChildrenToToggle) do
-                local childElement = element:GetNamedChild(elementName)
-                if childElement then
-                    GroupMenu.Interface.SafeSetElementHiddenStatus(childElement, elementDisabled)
-                end
+            if mouseEnabled ~= control.originalMouseEnabled then
+                control:SetMouseEnabled(control.originalMouseEnabled)
             end
-
-            previousElementDisabled = elementDisabled
-
+            if forceHiddenStatus then
+                control:SetHidden(hidden)
+            elseif hiddenStatus ~= control.originalHiddenStatus then
+                control:SetHidden(control.originalHiddenStatus)
+            end
         end
 
     end
 
-end
-
-function GroupMenu.Interface.SafeSetElementHiddenStatus(element, hidden)
-
-    if hidden == true then
-        GroupMenu.Interface.SafeSetElementMouseEnabled(element, false)
-        GroupMenu.Interface.SafeSetElementOffsetX(element, 0)
-        GroupMenu.Interface.SafeSetElementHidden(element, true)
-    else
-        GroupMenu.Interface.SafeSetElementMouseEnabled(element, nil)
-        GroupMenu.Interface.SafeSetElementOffsetX(element, nil)
-        GroupMenu.Interface.SafeSetElementHidden(element, nil)
+    for _, controlName in pairs(GroupMenu.Interface.Elements.PotentialColumnChildrenToToggle) do
+        local childControl = control:GetNamedChild(controlName)
+        if childControl then
+            setHidden(childControl, hidden, forceHiddenStatus)
+        end
     end
 
-end
-
-function GroupMenu.Interface.SafeSetElementMouseEnabled(element, state)
-
-    if element.originalMouseEnabled == nil then
-        element.originalMouseEnabled = element:IsMouseEnabled()
-    end
-
-    element:SetMouseEnabled(state == nil and element.originalMouseEnabled or state)
-
-end
-
-function GroupMenu.Interface.SafeSetElementOffsetX(element, newOffsetX)
-
-    local _, point, relTo, relPoint, offsetX, offsetY = element:GetAnchor(0)
-
-    if element.originalOffsetX == nil then
-        element.originalOffsetX = offsetX
-    end
-
-    if newOffsetX == nil then
-        newOffsetX = element.originalOffsetX
-    end
-
-    element:SetAnchor(point, relTo, relPoint, newOffsetX, offsetY)
-
-end
-
-function GroupMenu.Interface.SafeSetElementHidden(element, state)
-
-    if element.originalHiddenStatus == nil then
-        element.originalHiddenStatus = element:IsHidden()
-    end
-
-    element:SetHidden(state == nil and element.originalHiddenStatus or state)
+    setHidden(control, hidden, forceHiddenStatus)
 
 end
 

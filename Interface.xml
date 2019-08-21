@@ -68,6 +68,9 @@
             <OnMouseExit>
                 ZO_GroupListRowChild_OnMouseExit(self)
             </OnMouseExit>
+            <OnMouseUp>
+                ZO_GroupListRow_OnMouseUp(self.row, button, upInside)
+            </OnMouseUp>
         </Label>
 
         <Label name="GroupMenu_GroupListRowMemberIndex" inherits="GroupMenu_ListRowLabel" horizontalAlignment="RIGHT" virtual="true">
@@ -79,6 +82,10 @@
             <OnMouseEnter>
                 GroupMenu.Interface.GroupListRowTooltipControl_OnMouseEnter(self)
             </OnMouseEnter>
+        </Label>
+
+        <Label name="GroupMenu_GroupListRowCustomLevel" inherits="GroupMenu_ListRowLabel" virtual="true">
+            <Anchor point="LEFT" relativeTo="$(parent)Level" relativePoint="RIGHT" offsetX="ZO_KEYBOARD_GROUP_LIST_PADDING_X" />
         </Label>
 
         <Label name="GroupMenu_GroupListRowChampionPoints" inherits="GroupMenu_ListRowLabel" virtual="true">
