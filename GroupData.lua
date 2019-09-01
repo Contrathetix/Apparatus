@@ -41,7 +41,7 @@ end
 function GroupMenu.GroupData.EventHandlers.OnGroupUpdate(_)
     local masterList = GroupMenu.GroupData.GetMasterList()
     for i=1, #masterList do
-        GroupMenu.GroupData.UpdateMemberData(masterList.unitTag)
+        GroupMenu.GroupData.UpdateMemberData(masterList[i].unitTag, masterList[i])
     end
     zo_callLater(GroupMenu.GroupList.UpdateEntireMenu, GroupMenu.GroupData.MenuUpdateDelay)
 end

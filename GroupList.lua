@@ -118,13 +118,6 @@ function GroupMenu.GroupList.UpdateRowData(index, masterListData)
     GroupMenu.GroupList.UpdateRowElementWidths(rowElements)
     GroupMenu.GroupList.UpdateRowElementVisibility(rowElements, unitData)
 
-    -- update the crown column visibility
-    --[[
-    if GroupMenu.ConfigData.GetColumnEnabled(GroupMenu.Constants.INDEX_CROWN) and unitData.leader then
-        GroupMenu.Interface.UpdateControlHiddenStatus(rowElements[GroupMenu.Constants.INDEX_CROWN], false, true)
-    end
-    ]]
-
     -- reset the colours and stuff
     local row = GroupMenu.GroupList.GetListRow(index)
     if row then ZO_GroupListRow_OnMouseExit(row) end
