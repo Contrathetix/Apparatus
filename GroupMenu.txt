@@ -1,23 +1,26 @@
 ## Title: GroupMenu
 ## Author: Contrathetix
 ## APIVersion: 100028
-## AddOnVersion: 001
-## Version: 1
+## AddOnVersion: 002
+## Version: 2
 ## IsLibrary: false
 ## DependsOn: LibStub LibAddonMenu-2.0
 ## SavedVariables: GroupMenuData
 
 GroupMenu.lua
+
 Constants.lua
-Events.lua
-ConfigData.lua
-ConfigMenu.lua
+Utilities.lua
 
 /Strings/common.lua
 /Strings/$(language).lua
 
-Interface.lua
-Interface.xml
+GroupData.lua
+ConfigData.lua
+ConfigMenu.lua
+
+GroupList.lua
+GroupList.xml
 
 ## This Add-on is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates.
 ## The Elder Scrolls® and related logos are registered trademarks or trademarks of ZeniMax Media Inc. in the United States and/or other countries.

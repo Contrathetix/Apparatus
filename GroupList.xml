@@ -23,7 +23,7 @@
             </OnInitialized>
         </Label>
 
-        <Label name="GroupMenu_GroupListHeadersAlliance" inherits="ZO_GroupHeader" horizontalAlignment="CENTER" virtual="true">
+        <Label name="GroupMenu_GroupListHeadersAlliance" inherits="ZO_GroupHeader" horizontalAlignment="CENTER" wrapMode="TRUNCATE" virtual="true">
             <Anchor point="LEFT" relativeTo="$(parent)ChampionPoints" relativePoint="RIGHT" offsetX="ZO_KEYBOARD_GROUP_LIST_PADDING_X" />
             <OnInitialized>
                 self:SetText(GroupMenu.Strings.Alliance)
@@ -63,7 +63,7 @@
                 self.row = self:GetParent()
             </OnInitialized>
             <OnMouseEnter>
-                GroupMenu.Interface.GroupListRowLabel_OnMouseEnter(self)
+                GroupMenu.GroupList.EventHandlers.OnRowItemMouseEnter(self)
             </OnMouseEnter>
             <OnMouseExit>
                 ZO_GroupListRowChild_OnMouseExit(self)
@@ -79,9 +79,6 @@
 
         <Label name="GroupMenu_GroupListRowName" mouseEnabled="true" inherits="GroupMenu_ListRowLabel" horizontalAlignment="LEFT" virtual="true">
             <Anchor point="LEFT" relativeTo="$(parent)MemberIndex" relativePoint="RIGHT" offsetX="ZO_KEYBOARD_GROUP_LIST_PADDING_X" />
-            <OnMouseEnter>
-                GroupMenu.Interface.GroupListRowTooltipControl_OnMouseEnter(self)
-            </OnMouseEnter>
         </Label>
 
         <Label name="GroupMenu_GroupListRowCustomLevel" inherits="GroupMenu_ListRowLabel" virtual="true">
@@ -103,7 +100,7 @@
                         self.row = self:GetParent():GetParent()
                     </OnInitialized>
                     <OnMouseEnter>
-                        GroupMenu.Interface.GroupListRowTooltipControl_OnMouseEnter(self)
+                        GroupMenu.GroupList.EventHandlers.OnRowItemMouseEnter(self)
                     </OnMouseEnter>
                     <OnMouseExit>
                         ZO_GroupListRowChild_OnMouseExit(self)
@@ -123,7 +120,7 @@
                         self.row = self:GetParent():GetParent()
                     </OnInitialized>
                     <OnMouseEnter>
-                        GroupMenu.Interface.GroupListRowTooltipControl_OnMouseEnter(self)
+                        GroupMenu.GroupList.EventHandlers.OnRowItemMouseEnter(self)
                     </OnMouseEnter>
                     <OnMouseExit>
                         ZO_GroupListRowChild_OnMouseExit(self)

@@ -1,6 +1,6 @@
 GroupMenu.ConfigMenu = {}
 
-function GroupMenu.ConfigMenu.SetupMenu()
+function GroupMenu.ConfigMenu.Initialize()
 
     local LAM2 = LibStub:GetLibrary('LibAddonMenu-2.0')
 

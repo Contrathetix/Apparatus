@@ -16,7 +16,7 @@ GroupMenu.ConfigData.DefaultColumnWidth = {
     [GroupMenu.Constants.INDEX_CHAMPIONICON] = 22,
     [GroupMenu.Constants.INDEX_ROLE] = 100,
     [GroupMenu.Constants.INDEX_CP] = 80,
-    [GroupMenu.Constants.INDEX_ALLIANCE] = 50,
+    [GroupMenu.Constants.INDEX_ALLIANCE] = 30,
     [GroupMenu.Constants.INDEX_ALLIANCERANK] = 50,
     [GroupMenu.Constants.INDEX_RACE] = 80,
     [GroupMenu.Constants.INDEX_GENDER] = 70,
@@ -96,6 +96,27 @@ function GroupMenu.ConfigData.GetColumnWidth(column)
     return columnWidth
 end
 
+function GroupMenu.ConfigData.GetColumnWidthAll()
+    local columnWidths = {
+        [GroupMenu.Constants.INDEX_CROWN] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_CROWN),
+        [GroupMenu.Constants.INDEX_NAME_ORIGINAL] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_NAME_ORIGINAL),
+        [GroupMenu.Constants.INDEX_INDEX] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_INDEX),
+        [GroupMenu.Constants.INDEX_NAME] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_NAME),
+        [GroupMenu.Constants.INDEX_ZONE] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_ZONE),
+        [GroupMenu.Constants.INDEX_CLASS] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_CLASS),
+        [GroupMenu.Constants.INDEX_LEVEL] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_LEVEL),
+        [GroupMenu.Constants.INDEX_CHAMPIONICON] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_CHAMPIONICON),
+        [GroupMenu.Constants.INDEX_ROLE] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_ROLE),
+        [GroupMenu.Constants.INDEX_CP] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_CP),
+        [GroupMenu.Constants.INDEX_ALLIANCE] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_ALLIANCE),
+        [GroupMenu.Constants.INDEX_ALLIANCERANK] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_ALLIANCERANK),
+        [GroupMenu.Constants.INDEX_RACE] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_RACE),
+        [GroupMenu.Constants.INDEX_GENDER] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_GENDER),
+        [GroupMenu.Constants.INDEX_SOCIAL] = GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_SOCIAL)
+    }
+    return columnWidths
+end
+
 function GroupMenu.ConfigData.GetConfiguredColumnWidth(column)
     return GroupMenu.ConfigData.Saved.ColumnWidth[column]
 end
@@ -109,49 +130,14 @@ function GroupMenu.ConfigData.GetDefaultColumnWidth(column)
 end
 
 function GroupMenu.ConfigData.ResetSavedData()
-    GroupMenu.ConfigData.Saved = GroupMenu.ConfigData.RecursiveTableCopy(GroupMenu.ConfigData.SavedTemplate)
-end
-
-function GroupMenu.ConfigData.RecursiveTableCopy(source)
-    if source == nil then return nil end
-    local target = {}
-    for key, value in pairs(source) do
-        if type(value) == 'table' then
-            target[key] = GroupMenu.ConfigData.RecursiveTableCopy(value)
-        else
-            target[key] = value
-        end
-    end
-    setmetatable(target, GroupMenu.ConfigData.RecursiveTableCopy(getmetatable(source)))
-    return target
+    GroupMenu.ConfigData.Saved = GroupMenu.Utilities.CopyTable(GroupMenu.ConfigData.SavedTemplate)
 end
 
 function GroupMenu.ConfigData.GetTotalColumnWidth()
-
     local totalWidth = 0
-
-    local columnWidths = {
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_CROWN),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_NAME_ORIGINAL),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_INDEX),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_NAME),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_ZONE),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_CLASS),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_LEVEL),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_CHAMPIONICON),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_ROLE),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_CP),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_ALLIANCE),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_ALLIANCERANK),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_RACE),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_GENDER),
-        GroupMenu.ConfigData.GetColumnWidth(GroupMenu.Constants.INDEX_SOCIAL)
-    }
-
-    for i=1, #columnWidths do
-        totalWidth = totalWidth + columnWidths[i] + ZO_KEYBOARD_GROUP_LIST_PADDING_X
+    local widths = GroupMenu.ConfigData.GetColumnWidthAll()
+    for _, width in pairs(widths) do
+        totalWidth = totalWidth + width + ZO_KEYBOARD_GROUP_LIST_PADDING_X
     end
-
     return totalWidth
-
 end
