@@ -30,10 +30,10 @@ function GroupMenu.GroupList.EventHandlers.OnMenuSceneStateChange(oldState, newS
     elseif newState == SCENE_SHOWN then
         -- menu is shown to the user
         GroupMenu.GroupList.UpdateEntireMenu()
-        GroupMenu.GroupData.SetDataChangeEventRegistrationState(true)
+        GroupMenu.GroupData.SetFullMenuUpdateRegistrationState(true)
     elseif newState == SCENE_HIDDEN then
         -- menu is hidden
-        GroupMenu.GroupData.SetDataChangeEventRegistrationState(false)
+        GroupMenu.GroupData.SetFullMenuUpdateRegistrationState(false)
         GroupMenu.GroupList.UpdateGroupMenuSize(false)
     end
 end
@@ -55,11 +55,11 @@ function GroupMenu.GroupList.UpdateEntireMenu()
     GroupMenu.GroupList.UpdateHeaderRow()
     local masterList = GroupMenu.GroupData.GetMasterList()
     for i=1, #masterList do
-        GroupMenu.GroupList.UpdateRowData(i, masterList[i])
+        GroupMenu.GroupList.UpdateRow(i, masterList[i])
     end
 end
 
-function GroupMenu.GroupList.UpdateRowData(index, masterListData)
+function GroupMenu.GroupList.UpdateRow(index, masterListData)
 
     local rowElements = GroupMenu.GroupList.GetListRowElements(index)
 
@@ -69,7 +69,7 @@ function GroupMenu.GroupList.UpdateRowData(index, masterListData)
         if element == nil then return end
     end
 
-    local unitData = GroupMenu.GroupData.GetMemberData(masterListData.unitTag, masterListData)
+    local unitData = GroupMenu.GroupData.Cache.GetData(masterListData.displayName, masterListData)
 
     -- update the new name label text and tooltip
     if GroupMenu.ConfigData.GetNameDisplayMode() == GroupMenu.Constants.MENU_NAME_DISPLAY_OPTION_ACCOUNT then
