@@ -61,6 +61,9 @@ end
 
 function GroupMenu.GroupList.UpdateRow(index, masterListData)
 
+    -- for some reason, may not be defined before first opening group list
+    if GROUP_LIST.groupSize == nil then return end
+
     local rowElements = GroupMenu.GroupList.GetListRowElements(index)
 
     if rowElements == nil or masterListData == nil then return end
@@ -125,6 +128,9 @@ function GroupMenu.GroupList.UpdateRow(index, masterListData)
 end
 
 function GroupMenu.GroupList.UpdateHeaderRow()
+
+    -- for some reason, may not be defined before first opening group list
+    if GROUP_LIST.groupSize == nil then return end
 
     local headerElements = GroupMenu.GroupList.GetHeaderRowElements()
 
