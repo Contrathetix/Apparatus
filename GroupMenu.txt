@@ -16,6 +16,7 @@ Utilities.lua
 /Strings/$(language).lua
 
 GroupData.lua
+
 ConfigData.lua
 ConfigMenu.lua
 

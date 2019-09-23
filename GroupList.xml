@@ -63,7 +63,7 @@
                 self.row = self:GetParent()
             </OnInitialized>
             <OnMouseEnter>
-                GroupMenu.GroupList.EventHandlers.OnRowItemMouseEnter(self)
+                GroupMenu.GroupList.EventHandlers.EventRowItemMouseEnter(self)
             </OnMouseEnter>
             <OnMouseExit>
                 ZO_GroupListRowChild_OnMouseExit(self)
@@ -72,6 +72,21 @@
                 ZO_GroupListRow_OnMouseUp(self.row, button, upInside)
             </OnMouseUp>
         </Label>
+
+        <Texture name="GroupMenu_AllianceIconTexture" mouseEnabled="true" layer="OVERLAY" textureFile="EsoUI/Art/Stats/AllianceBadge_Aldmeri.dds" virtual="true">
+            <Anchor point="CENTER" />
+            <Dimensions x="26" y="26" />
+            <OnInitialized>
+                self.tooltip = ''
+                self.row = self:GetParent():GetParent()
+            </OnInitialized>
+            <OnMouseEnter>
+                GroupMenu.GroupList.EventHandlers.EventRowItemMouseEnter(self)
+            </OnMouseEnter>
+            <OnMouseExit>
+                ZO_GroupListRowChild_OnMouseExit(self)
+            </OnMouseExit>
+        </Texture>
 
         <Label name="GroupMenu_GroupListRowMemberIndex" inherits="GroupMenu_ListRowLabel" horizontalAlignment="RIGHT" virtual="true">
             <Anchor point="LEFT" relativeTo="$(parent)CharacterName" relativePoint="RIGHT" offsetX="ZO_KEYBOARD_GROUP_LIST_PADDING_X" />
@@ -92,40 +107,14 @@
         <Control name="GroupMenu_GroupListRowAlliance" virtual="true">
             <Anchor point="LEFT" relativeTo="$(parent)ChampionPoints" relativePoint="RIGHT" offsetX="ZO_KEYBOARD_GROUP_LIST_PADDING_X" />
             <Controls>
-                <Texture name="$(parent)Texture" mouseEnabled="true" layer="OVERLAY" textureFile="EsoUI/Art/Stats/AllianceBadge_Aldmeri.dds">
-                    <Anchor point="CENTER" />
-                    <Dimensions x="26" y="26" />
-                    <OnInitialized>
-                        self.tooltip = ''
-                        self.row = self:GetParent():GetParent()
-                    </OnInitialized>
-                    <OnMouseEnter>
-                        GroupMenu.GroupList.EventHandlers.OnRowItemMouseEnter(self)
-                    </OnMouseEnter>
-                    <OnMouseExit>
-                        ZO_GroupListRowChild_OnMouseExit(self)
-                    </OnMouseExit>
-                </Texture>
+                <Texture name="$(parent)Texture" inherits="GroupMenu_AllianceIconTexture"></Texture>
             </Controls>
         </Control>
 
         <Control name="GroupMenu_GroupListRowAllianceRank" virtual="true">
             <Anchor point="LEFT" relativeTo="$(parent)Alliance" relativePoint="RIGHT" offsetX="ZO_KEYBOARD_GROUP_LIST_PADDING_X" />
             <Controls>
-                <Texture name="$(parent)Texture" mouseEnabled="true" layer="OVERLAY" textureFile="EsoUI/Art/Stats/AllianceBadge_Aldmeri.dds">
-                    <Anchor point="CENTER" />
-                    <Dimensions x="26" y="26"/>
-                    <OnInitialized>
-                        self.tooltip = ''
-                        self.row = self:GetParent():GetParent()
-                    </OnInitialized>
-                    <OnMouseEnter>
-                        GroupMenu.GroupList.EventHandlers.OnRowItemMouseEnter(self)
-                    </OnMouseEnter>
-                    <OnMouseExit>
-                        ZO_GroupListRowChild_OnMouseExit(self)
-                    </OnMouseExit>
-                </Texture>
+                <Texture name="$(parent)Texture" inherits="GroupMenu_AllianceIconTexture"></Texture>
             </Controls>
         </Control>
 

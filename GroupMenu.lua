@@ -3,8 +3,8 @@ GroupMenu = {}
 GroupMenu.Info = {
     AddOnName = 'GroupMenu',
     Author = 'Contrathetix',
-    Version = '2',
-    SavedVariablesVersion = 3
+    Version = '3',
+    SavedVariablesVersion = 4
 }
 
 function GroupMenu.OnAddOnLoaded(_, addonName)
@@ -13,7 +13,9 @@ function GroupMenu.OnAddOnLoaded(_, addonName)
 
     EVENT_MANAGER:UnregisterForEvent(GroupMenu.Info.AddOnName, EVENT_ADD_ON_LOADED)
 
-    GroupMenu.ConfigData.Saved = ZO_SavedVars:NewAccountWide('GroupMenuData', GroupMenu.Info.SavedVariablesVersion, nil, GroupMenu.ConfigData.SavedTemplate)
+    GroupMenu.ConfigData.Saved = ZO_SavedVars:NewAccountWide(
+        'GroupMenuData', GroupMenu.Info.SavedVariablesVersion, nil, GroupMenu.ConfigData.GetDefaultSavedData()
+    )
 
     GroupMenu.ConfigMenu.Initialize()
     GroupMenu.GroupData.Initialize()
