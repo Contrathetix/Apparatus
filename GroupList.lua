@@ -66,14 +66,14 @@ end
 -- update the menu data, and only data, nothing else, no layout, etc.
 function GroupMenu.GroupList.UpdateMenu()
 
-    if GroupMenu.GroupData.GetGroupSize() < 1 then return end
-
     GroupMenu.GroupList.UpdateMenuHeaders()
+
+    if GroupMenu.GroupData.GetGroupSize() < 1 then return end
 
     local masterList = GroupMenu.GroupData.GetMasterList()
 
     for i=1, #masterList do
-        GroupMenu.GroupList.UpdateMenuRow(i, masterList[i].displayName)
+        GroupMenu.GroupList.UpdateMenuRow(i, masterList[i])
     end
 
 end
@@ -96,10 +96,10 @@ function GroupMenu.GroupList.UpdateMenuHeaders(updateLayout)
 
 end
 
-function GroupMenu.GroupList.UpdateMenuRow(index, displayName)
+function GroupMenu.GroupList.UpdateMenuRow(index, masterListData)
 
     local rowElements = GroupMenu.GroupList.GetListRowElements(index)
-    local unitData = GroupMenu.GroupData.GetUnitData(displayName)
+    local unitData = GroupMenu.GroupData.GetUnitData(masterListData)
 
     if not rowElements or not unitData then return end
 
@@ -165,23 +165,17 @@ function GroupMenu.GroupList.UpdateMenuRowLayout(rowElements, unitData)
 
     for key, element in pairs(rowElements) do
 
-        local visible = columnEnabledTable[key]
-        local targetWidth = 1
+        local targetWidth = columnWidthTable[key]
 
-        if unitData then
-            if key == GroupMenu.Constants.KEY_CROWN then
-                visible = visible and unitData.isLeader
-            --elseif index == GroupMenu.Constants.KEY_CLASS then
-            --    visible = visible and unitData.isOnline
-            elseif key == GroupMenu.Constants.KEY_CHAMPIONICON then
+        if key ~= GroupMenu.Constants.KEY_CROWN then
+            local visible = columnEnabledTable[key]
+            if unitData and key == GroupMenu.Constants.KEY_CHAMPIONICON then
                 visible = visible and unitData.isOnline and unitData.level >= GroupMenu.Constants.MAX_LEVEL
             end
-        end
-
-        GroupMenu.GroupList.SetElementVisibility(element, visible)
-
-        if visible or (key == GroupMenu.Constants.KEY_CROWN and columnEnabledTable[key]) then
-            targetWidth = columnWidthTable[key]
+            GroupMenu.GroupList.SetElementVisibility(element, visible)
+            if visible == false then
+                targetWidth = 1
+            end
         end
 
         element:SetWidth(targetWidth)

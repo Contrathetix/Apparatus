@@ -18,7 +18,6 @@ function GroupMenu.OnAddOnLoaded(_, addonName)
     )
 
     GroupMenu.ConfigMenu.Initialize()
-    GroupMenu.GroupData.Initialize()
     GroupMenu.GroupList.Initialize()
 
 end
