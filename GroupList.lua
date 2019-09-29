@@ -355,12 +355,12 @@ function GroupMenu.GroupList.GetListRowElements(index)
         local templatePrefix = 'GroupMenu_GroupListRow'
         local rowElements = GroupMenu.GroupList.GetGenericRowElements(listRow, namePrefix, templatePrefix, false)
 
-        -- hide the existing level label
-        local originalLevelLabel = GroupMenu.GroupList.GetListRow(index):GetNamedChild('Level')
-        originalLevelLabel:SetWidth(1)
-        originalLevelLabel:SetHidden(true)
-
         if rowElements ~= nil then
+
+            -- hide the existing level label
+            local originalLevelLabel = GroupMenu.GroupList.GetListRow(index):GetNamedChild('Level')
+            originalLevelLabel:SetWidth(1)
+            originalLevelLabel:SetHidden(true)
 
             -- update the zone anchor to account for the new name column
             rowElements[GroupMenu.Constants.KEY_ZONE]:SetAnchor(
